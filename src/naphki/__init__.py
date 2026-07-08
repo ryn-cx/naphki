@@ -1,3 +1,4 @@
+# TODO: Validate
 """Naphki is a client for downloading and parsing data from NHK World."""
 
 from datetime import datetime

@@ -1,12 +1,11 @@
-# ruff: noqa: D100, D101
-from __future__ import annotations
-
+# ruff: noqa: D100, D101, D102, TC001, TC002, TC003
 from typing import Any
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+from good_ass_pydantic_integrator import GAPIBaseModel
+from pydantic import AwareDatetime, ConfigDict, Field
 
 
-class FieldShards(BaseModel):
+class FieldShards(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     total: int
     successful: int
@@ -14,13 +13,13 @@ class FieldShards(BaseModel):
     failed: int
 
 
-class Total(BaseModel):
+class Total(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     value: int
     relation: str
 
 
-class FieldSource(BaseModel):
+class FieldSource(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     thumbnail: str
     description: str
@@ -29,7 +28,7 @@ class FieldSource(BaseModel):
     slug: str
 
 
-class Hit(BaseModel):
+class Hit(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     field_index: str = Field(..., alias="_index")
     field_id: str = Field(..., alias="_id")
@@ -37,14 +36,14 @@ class Hit(BaseModel):
     field_source: FieldSource = Field(..., alias="_source")
 
 
-class Hits(BaseModel):
+class Hits(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     total: Total
     max_score: float
     hits: list[Hit]
 
 
-class MultiMatch(BaseModel):
+class MultiMatch(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     query: str
     type: str
@@ -52,22 +51,22 @@ class MultiMatch(BaseModel):
     operator: str
 
 
-class ShouldItem(BaseModel):
+class ShouldItem(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     multi_match: MultiMatch
 
 
-class Bool(BaseModel):
+class Bool(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     should: list[ShouldItem]
 
 
-class Query(BaseModel):
+class Query(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     bool: Bool
 
 
-class Body(BaseModel):
+class Body(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     query: Query
     from_: int = Field(..., alias="from")
@@ -75,7 +74,7 @@ class Body(BaseModel):
     field_source: list[str] = Field(..., alias="_source")
 
 
-class Naphki(BaseModel):
+class Nahpki(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     timestamp: AwareDatetime
@@ -83,10 +82,42 @@ class Naphki(BaseModel):
     body: Body
 
 
-class ShowsSearchModel(BaseModel):
+class ShouldItem1(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    multi_match: MultiMatch
+
+
+class Bool1(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    should: list[ShouldItem1]
+
+
+class Query1(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    bool: Bool1
+
+
+class Body1(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    query: Query1
+    from_: int = Field(..., alias="from")
+    size: int
+    field_source: list[str] = Field(..., alias="_source")
+
+
+class Naphki(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    url: str
+    timestamp: AwareDatetime
+    params: dict[str, Any]
+    body: Body1
+
+
+class ShowsSearchModel(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     took: int
     timed_out: bool
     field_shards: FieldShards = Field(..., alias="_shards")
     hits: Hits
-    naphki: Naphki
+    nahpki: Nahpki | None = None
+    naphki: Naphki | None = None

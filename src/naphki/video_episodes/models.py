@@ -1,10 +1,9 @@
-# ruff: noqa: D100, D101
-from __future__ import annotations
+# ruff: noqa: D100, D101, D102, TC001, TC002, TC003
+from good_ass_pydantic_integrator import GAPIBaseModel
+from pydantic import AwareDatetime, ConfigDict
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict
 
-
-class Pagination(BaseModel):
+class Pagination(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     limit: int
     offset: int
@@ -14,7 +13,7 @@ class Pagination(BaseModel):
     previous: str | None
 
 
-class VideoProgram(BaseModel):
+class VideoProgram(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
     title: str
@@ -23,20 +22,20 @@ class VideoProgram(BaseModel):
     uri: str
 
 
-class BroadcastSchedule(BaseModel):
+class BroadcastSchedule(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     start_at: AwareDatetime
     end_at: AwareDatetime
 
 
-class Image(BaseModel):
+class Image(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     width: int
     height: int
 
 
-class Video(BaseModel):
+class Video(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     vod_id: None
     url: str
@@ -46,7 +45,7 @@ class Video(BaseModel):
     expired_at: AwareDatetime
 
 
-class Category(BaseModel):
+class Category(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
     url: str
@@ -54,7 +53,7 @@ class Category(BaseModel):
     uri: str
 
 
-class Tag(BaseModel):
+class Tag(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
     url: str
@@ -62,7 +61,7 @@ class Tag(BaseModel):
     uri: str
 
 
-class Item(BaseModel):
+class Item(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     type: str
     id: str
@@ -83,21 +82,29 @@ class Item(BaseModel):
     tags: list[Tag]
 
 
-class Params(BaseModel):
+class Params(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     limit: int
     offset: int
 
 
-class Naphki(BaseModel):
+class Nahpki(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    url: str
+    timestamp: AwareDatetime
+    params: Params
+
+
+class Naphki(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     timestamp: str | AwareDatetime
     params: Params
 
 
-class VideoEpisodesModel(BaseModel):
+class VideoEpisodesModel(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     pagination: Pagination
     items: list[Item]
-    naphki: Naphki
+    nahpki: Nahpki | None = None
+    naphki: Naphki | None = None

@@ -1,63 +1,62 @@
-# ruff: noqa: D100, D101
-from __future__ import annotations
-
+# ruff: noqa: D100, D101, D102, TC001, TC002, TC003
 from typing import Any
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict
+from good_ass_pydantic_integrator import GAPIBaseModel
+from pydantic import AwareDatetime, ConfigDict
 
 
-class LandscapeItem(BaseModel):
+class LandscapeItem(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     width: int
     height: int
 
 
-class PortraitItem(BaseModel):
+class PortraitItem(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     width: int
     height: int
 
 
-class Images(BaseModel):
+class Images(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     landscape: list[LandscapeItem]
     portrait: list[PortraitItem]
 
 
-class Image(BaseModel):
+class Image(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     width: int
     height: int
 
 
-class Logo(BaseModel):
+class Logo(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     width: int
 
 
-class Sp(BaseModel):
+class Sp(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     images: list[Image]
     logo: Logo
 
 
-class Pc(BaseModel):
+class Pc(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     images: list[Image]
     logo: Logo
 
 
-class Hero(BaseModel):
+class Hero(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     sp: Sp
     pc: Pc
 
 
-class Category(BaseModel):
+class Category(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str
     url: str
@@ -65,33 +64,40 @@ class Category(BaseModel):
     uri: str
 
 
-class VideoEpisodes(BaseModel):
+class VideoEpisodes(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     total: int
     uri: str
 
 
-class VideoClips(BaseModel):
+class VideoClips(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     total: int
     uri: str
 
 
-class Casts(BaseModel):
+class Casts(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     title: None
     total: int
     uri: str
 
 
-class Naphki(BaseModel):
+class Nahpki(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     timestamp: AwareDatetime
     params: dict[str, Any]
 
 
-class VideoProgramsModel(BaseModel):
+class Naphki(GAPIBaseModel):
+    model_config = ConfigDict(extra="forbid")
+    url: str
+    timestamp: AwareDatetime
+    params: dict[str, Any]
+
+
+class VideoProgramsModel(GAPIBaseModel):
     model_config = ConfigDict(extra="forbid")
     type: str
     id: str
@@ -117,4 +123,5 @@ class VideoProgramsModel(BaseModel):
     video_episodes: VideoEpisodes
     video_clips: VideoClips
     casts: Casts
-    naphki: Naphki
+    nahpki: Nahpki | None = None
+    naphki: Naphki | None = None
