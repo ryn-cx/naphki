@@ -15,12 +15,12 @@ class TestGet:
     def test_get_video_episodes(self) -> None:
         """Test getting video episodes."""
         model = client.video_episodes.get()
-        client.video_episodes.save_new_json_file(client.video_episodes.dump(model))
+        client.video_episodes.save_new_json_file(client.video_episodes.original_input(model))
 
     def test_get_video_episodes_for_program(self) -> None:
         """Test getting a single show's video episodes."""
         model = client.video_episodes.get("dwc")
-        client.video_episodes.save_new_json_file(client.video_episodes.dump(model))
+        client.video_episodes.save_new_json_file(client.video_episodes.original_input(model))
 
     def test_get_video_episodes_for_program_all_pages(self) -> None:
         """Test getting every page of a single show's video episodes."""
@@ -46,17 +46,17 @@ class TestGet:
     def test_get_video_episode(self) -> None:
         """Test getting a single video episode."""
         model = client.video_episode.get(5001461)
-        client.video_episode.save_new_json_file(client.video_episode.dump(model))
+        client.video_episode.save_new_json_file(client.video_episode.original_input(model))
 
     def test_get_video_programs(self) -> None:
         """Test getting a single video program."""
         model = client.video_programs.get("japanologyplus")
-        client.video_programs.save_new_json_file(client.video_programs.dump(model))
+        client.video_programs.save_new_json_file(client.video_programs.original_input(model))
 
     def test_get_shows_search(self) -> None:
         """Test searching for shows."""
         model = client.shows_search.get("japan")
-        client.shows_search.save_new_json_file(client.shows_search.dump(model))
+        client.shows_search.save_new_json_file(client.shows_search.original_input(model))
 
     def test_get_shows_search_all_pages(self) -> None:
         """Test getting every page of a shows search."""
