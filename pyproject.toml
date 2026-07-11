@@ -1,16 +1,22 @@
-# TODO: Validate
 [project]
 name = "naphki"
 version = "0.1.0"
-description = "Unofficial NHK World API."
+description = "NHK World API wrapper."
 readme = "README.md"
-authors = [
-    { name = "ryn-cx", email = "262888154+ryn-cx@users.noreply.github.com" }
-]
 requires-python = ">=3.14"
+authors = [
+  { name = "ryn-cx", email = "262888154+ryn-cx@users.noreply.github.com" }
+]
 dependencies = [
-    "get-around",
-    "good-ass-pydantic-integrator",
+  "get-around",
+  "good-ass-pydantic-integrator",
+]
+
+[dependency-groups]
+dev = [
+  "prek>=0.3.3",
+  "pytest>=9.0.2",
+  "ruff>=0.15.2",
 ]
 
 [build-system]
@@ -19,30 +25,13 @@ build-backend = "uv_build"
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = [
-    "D100",
-    "D101",
-    "D102",
-    "D103",
-    "D104",
-    "D105",
-    "D106",
-    "D107",
-]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101"] # Asserts should be allowed in tests.
+"tests/**/*.py" = ["S101"]  # Asserts should be allowed in tests.
 
 [tool.uv.sources]
 get-around = { git = "https://github.com/ryn-cx/get-around" }
 good-ass-pydantic-integrator = { git = "https://github.com/ryn-cx/good-ass-pydantic-integrator" }
-
-[dependency-groups]
-dev = [
-    "prek>=0.3.3",
-    "pytest>=9.0.2",
-    "ruff>=0.15.2",
-]
