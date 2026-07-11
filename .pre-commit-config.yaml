@@ -1,3 +1,4 @@
+# TODO: Validate
 repos:
   # Ruff hooks (Copied from the repository).
   - repo: https://github.com/astral-sh/ruff-pre-commit

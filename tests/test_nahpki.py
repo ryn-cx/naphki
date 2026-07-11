@@ -1,38 +1,55 @@
 # TODO: Validate
-"""Tests."""
+from __future__ import annotations
 
 import json
 from datetime import UTC, datetime, timedelta
 
-from naphki import Naphki
+import pytest
+from get_around import build_client_automatically
 
-client = Naphki()
+from naphki import Naphki
+from naphki.exceptions import HTTPError, NoContentError
+
+client = Naphki(build_client_automatically())
+
+SEARCH_QUERY = "japan"
+EPISODE_ID = 5001461
+"""episode_id of a single video episode."""
+PROGRAM_ID = "japanologyplus"
+"""program_id of Japanology Plus."""
+EPISODES_PROGRAM_ID = "dwc"
+"""program_id used to filter video episodes to a single show."""
+INVALID_EPISODE_ID = 1
+INVALID_PROGRAM_ID = "qwertyuiopasdfghjkl"
+INVALID_SEARCH_QUERY = "qwertyuiopasdfghjklzxcvbnm"
 
 
 class TestGet:
-    """Test live get requests across every endpoint."""
-
     def test_get_video_episodes(self) -> None:
-        """Test getting video episodes."""
-        model = client.video_episodes.get()
-        client.video_episodes.save_new_json_file(client.video_episodes.original_input(model))
+        endpoint = client.video_episodes
+        model = endpoint.get()
+        assert model.items
+        endpoint.save_new_json_file(endpoint.original_input(model))
 
     def test_get_video_episodes_for_program(self) -> None:
-        """Test getting a single show's video episodes."""
-        model = client.video_episodes.get("dwc")
-        client.video_episodes.save_new_json_file(client.video_episodes.original_input(model))
+        endpoint = client.video_episodes
+        model = endpoint.get(EPISODES_PROGRAM_ID)
+        assert all(
+            item.video_program.id == EPISODES_PROGRAM_ID for item in model.items
+        )
+        endpoint.save_new_json_file(endpoint.original_input(model))
 
     def test_get_video_episodes_for_program_all_pages(self) -> None:
-        """Test getting every page of a single show's video episodes."""
-        pages = client.video_episodes.get_all("dwc")
+        endpoint = client.video_episodes
+        pages = endpoint.get_all(EPISODES_PROGRAM_ID)
         assert pages
         items = sum(len(page.items) for page in pages)
         assert items == pages[0].pagination.total
 
     def test_get_video_episodes_to_datetime(self) -> None:
-        """Test get_all stops at an inclusive published_at cutoff."""
+        endpoint = client.video_episodes
         cutoff = datetime.now(tz=UTC) - timedelta(days=5)
-        pages = client.video_episodes.get_all(to_datetime=cutoff)
+        pages = endpoint.get_all(to_datetime=cutoff)
         assert pages
         items = [item for page in pages for item in page.items]
         # Scraped back to at least the cutoff.
@@ -44,47 +61,60 @@ class TestGet:
         assert len(pages) < full_pages
 
     def test_get_video_episode(self) -> None:
-        """Test getting a single video episode."""
-        model = client.video_episode.get(5001461)
-        client.video_episode.save_new_json_file(client.video_episode.original_input(model))
+        endpoint = client.video_episode
+        model = endpoint.get(EPISODE_ID)
+        assert model.id == str(EPISODE_ID)
+        endpoint.save_new_json_file(endpoint.original_input(model))
 
     def test_get_video_programs(self) -> None:
-        """Test getting a single video program."""
-        model = client.video_programs.get("japanologyplus")
-        client.video_programs.save_new_json_file(client.video_programs.original_input(model))
+        endpoint = client.video_programs
+        model = endpoint.get(PROGRAM_ID)
+        assert model.id == PROGRAM_ID
+        endpoint.save_new_json_file(endpoint.original_input(model))
 
     def test_get_shows_search(self) -> None:
-        """Test searching for shows."""
-        model = client.shows_search.get("japan")
-        client.shows_search.save_new_json_file(client.shows_search.original_input(model))
+        endpoint = client.shows_search
+        model = endpoint.get(SEARCH_QUERY)
+        assert any(
+            SEARCH_QUERY in hit.field_source.title.lower()
+            for hit in model.hits.hits
+        )
+        endpoint.save_new_json_file(endpoint.original_input(model))
 
     def test_get_shows_search_all_pages(self) -> None:
-        """Test getting every page of a shows search."""
-        pages = client.shows_search.get_all("japan")
+        endpoint = client.shows_search
+        pages = endpoint.get_all(SEARCH_QUERY)
         assert len(pages) > 1
         hits = sum(len(page.hits.hits) for page in pages)
         assert hits == pages[0].hits.total.value
 
 
+class TestInvalidGet:
+    def test_invalid_get_video_episodes(self) -> None:
+        with pytest.raises(NoContentError) as error:
+            client.video_episodes.get(INVALID_PROGRAM_ID)
+        assert "items" in error.value.response
+
+    def test_invalid_get_video_episode(self) -> None:
+        with pytest.raises(HTTPError):
+            client.video_episode.get(INVALID_EPISODE_ID)
+
+    def test_invalid_get_video_programs(self) -> None:
+        with pytest.raises(HTTPError):
+            client.video_programs.get(INVALID_PROGRAM_ID)
+
+    def test_invalid_get_shows_search(self) -> None:
+        with pytest.raises(NoContentError) as error:
+            client.shows_search.get(INVALID_SEARCH_QUERY)
+        assert "hits" in error.value.response
+
+
 class TestParse:
-    """Test parsing every saved file for each endpoint."""
-
-    def test_parse_video_episodes(self) -> None:
-        """Test parsing video episodes files."""
-        for json_file in client.video_episodes.json_files():
-            client.video_episodes.parse(json.loads(json_file.read_text()))
-
-    def test_parse_video_episode(self) -> None:
-        """Test parsing video episode files."""
-        for json_file in client.video_episode.json_files():
-            client.video_episode.parse(json.loads(json_file.read_text()))
-
-    def test_parse_video_programs(self) -> None:
-        """Test parsing video programs files."""
-        for json_file in client.video_programs.json_files():
-            client.video_programs.parse(json.loads(json_file.read_text()))
-
-    def test_parse_shows_search(self) -> None:
-        """Test parsing shows search files."""
-        for json_file in client.shows_search.json_files():
-            client.shows_search.parse(json.loads(json_file.read_text()))
+    @pytest.mark.parametrize(
+        "endpoint_name",
+        ["video_episodes", "video_episode", "video_programs", "shows_search"],
+    )
+    def test_parse(self, endpoint_name: str) -> None:
+        endpoint = getattr(client, endpoint_name)
+        for json_file in endpoint.json_files():
+            endpoint.parse(json.loads(json_file.read_text()))

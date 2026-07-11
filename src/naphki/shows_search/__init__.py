@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, override
 
 from naphki.base_api_endpoint import BaseEndpoint
 from naphki.shows_search.models import ShowsSearchModel
@@ -56,6 +56,11 @@ class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
         }
         return self._client.download(endpoint, {}, json_body=body)
 
+    @staticmethod
+    @override
+    def has_content(response: dict[str, Any]) -> bool:
+        return bool(response["hits"]["hits"])
+
     def get(self, query: str) -> ShowsSearchModel:
         """Searches for shows and parses the result.
 
@@ -66,9 +71,13 @@ class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
 
         Returns:
             A ShowsSearchModel containing the parsed search results.
+
+        Raises:
+            NoContentError: If the response has no meaningful content. The raw
+                response is available on the exception's `response` attribute.
         """
         response = self.download(query)
-        return self.parse(response)
+        return self._parse_or_raise(response, has_content=self.has_content(response))
 
     def get_all(self, query: str) -> list[ShowsSearchModel]:
         """Searches for shows and parses every page of results.

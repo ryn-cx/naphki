@@ -24,17 +24,13 @@ class Naphki:
         self,
         language: str = "en",
         timeout: int = 30,
-        get_around_server: str | None = None,
-        get_around_password: str | None = None,
+        get_around_client: GetAround | None = None,
     ) -> None:
         """Initialize the Naphki client."""
         self.language = language
         self.timeout = timeout
 
-        self.get_around_client = GetAround(
-            server=get_around_server,
-            password=get_around_password,
-        )
+        self.get_around_client = get_around_client or GetAround()
 
         self.video_episodes = VideoEpisodes(self)
         self.video_episode = VideoEpisode(self)

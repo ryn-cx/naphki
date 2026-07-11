@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, override
 
 from naphki.base_api_endpoint import BaseEndpoint
 from naphki.video_programs.models import VideoProgramsModel
@@ -29,6 +29,11 @@ class VideoPrograms(BaseEndpoint[VideoProgramsModel]):
         endpoint = f"showsapi/v1/{language}/video_programs/{program_id}"
         return self._client.download(endpoint, {})
 
+    @staticmethod
+    @override
+    def has_content(response: dict[str, Any]) -> bool:
+        return bool(response["id"])
+
     def get(self, program_id: str, language: str = "") -> VideoProgramsModel:
         """Downloads and parses a single video program (show).
 
@@ -41,6 +46,10 @@ class VideoPrograms(BaseEndpoint[VideoProgramsModel]):
 
         Returns:
             A VideoProgramsModel containing the parsed data.
+
+        Raises:
+            NoContentError: If the response has no meaningful content. The raw
+                response is available on the exception's `response` attribute.
         """
         response = self.download(program_id, language)
-        return self.parse(response)
+        return self._parse_or_raise(response, has_content=self.has_content(response))

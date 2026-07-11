@@ -3,7 +3,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, override
 
 from naphki.base_api_endpoint import BaseEndpoint
 from naphki.video_episodes.models import VideoEpisodesModel
@@ -52,6 +52,11 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         params: dict[str, str | int] = {"limit": limit, "offset": offset}
         return self._client.download(endpoint, params)
 
+    @staticmethod
+    @override
+    def has_content(response: dict[str, Any]) -> bool:
+        return bool(response["items"])
+
     def get(
         self,
         program_id: str | None = None,
@@ -73,6 +78,10 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
 
         Returns:
             A VideoEpisodesModel containing the parsed data.
+
+        Raises:
+            NoContentError: If the response has no meaningful content. The raw
+                response is available on the exception's `response` attribute.
         """
         response = self.download(
             program_id,
@@ -80,7 +89,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
             offset=offset,
             language=language,
         )
-        return self.parse(response)
+        return self._parse_or_raise(response, has_content=self.has_content(response))
 
     def get_all(
         self,
