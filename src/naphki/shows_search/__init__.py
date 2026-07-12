@@ -1,5 +1,5 @@
 # TODO: Validate
-"""Shows search API endpoint."""
+"""Contains the ShowsSearch class."""
 
 from __future__ import annotations
 
@@ -10,21 +10,12 @@ from naphki.shows_search.models import ShowsSearchModel
 
 
 class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
-    """Provides methods to search for shows (video programs)."""
+    """Manage the shows search file."""
 
     _response_model = ShowsSearchModel
 
     def download(self, query: str, *, from_: int = 0, size: int = 40) -> dict[str, Any]:
-        """Searches for shows (video programs) matching a search term.
-
-        Args:
-            query: The search term, e.g. ``"japan"``.
-            from_: The number of results to skip (for pagination).
-            size: The number of results to return.
-
-        Returns:
-            The raw JSON response as a dict, suitable for passing to ``parse()``.
-        """
+        """Downloads the shows search file."""
         index = f"nhkworld@{self._client.language}@ondemand@vod@programs"
         endpoint = f"nwapi/showssearch/v1/{index}/list.json"
         body: dict[str, Any] = {
@@ -54,7 +45,12 @@ class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
             "size": size,
             "_source": ["title", "description", "slug", "url", "thumbnail"],
         }
-        return self._client.download(endpoint, {}, json_body=body)
+        return self._client.download(
+            endpoint,
+            {},
+            json_body=body,
+            log_id=f"{self.__class__.__name__} {query}",
+        )
 
     @staticmethod
     @override
@@ -62,22 +58,14 @@ class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
         return bool(response["hits"]["hits"])
 
     def get(self, query: str) -> ShowsSearchModel:
-        """Searches for shows and parses the result.
-
-        Convenience method that calls ``download()`` then ``parse()``.
-
-        Args:
-            query: The search term, e.g. ``"japan"``.
-
-        Returns:
-            A ShowsSearchModel containing the parsed search results.
+        """Downloads and parses the shows search file.
 
         Raises:
             NoContentError: If the response has no meaningful content. The raw
                 response is available on the exception's `response` attribute.
         """
         response = self.download(query)
-        return self._parse_or_raise(response, has_content=self.has_content(response))
+        return self._parse_or_raise(response, f"{self.__class__.__name__} {query}")
 
     def get_all(self, query: str) -> list[ShowsSearchModel]:
         """Searches for shows and parses every page of results.

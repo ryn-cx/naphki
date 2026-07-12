@@ -17,11 +17,19 @@ dev = [
   "prek>=0.3.3",
   "pytest>=9.0.2",
   "ruff>=0.15.2",
+  "ty>=0.0.58",
 ]
 
 [build-system]
 requires = ["uv_build>=0.9.18,<0.10.0"]
 build-backend = "uv_build"
+
+[tool.ty.src]
+exclude = ["**/models.py"]
+
+[[tool.mypy.overrides]]
+module = ["*.models", "models"]
+ignore_errors = true
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -30,7 +38,7 @@ select = ["ALL"]
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = ["S101"]  # Asserts should be allowed in tests.
+"tests/**/*.py" = ["S101", "D"]  # Asserts and missing docstrings allowed in tests.
 
 [tool.uv.sources]
 get-around = { git = "https://github.com/ryn-cx/get-around" }

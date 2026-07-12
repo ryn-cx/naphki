@@ -1,5 +1,5 @@
 # TODO: Validate
-"""Video episodes API endpoint."""
+"""Contains the VideoEpisodes class."""
 
 from __future__ import annotations
 
@@ -13,12 +13,7 @@ if TYPE_CHECKING:
 
 
 class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
-    """Provides methods to download, parse, and retrieve video episode data.
-
-    With no ``program_id`` this covers every video episode
-    (``GET /video_episodes``). With a ``program_id`` it covers the episodes of a
-    single show (``GET /video_programs/{program_id}/video_episodes``).
-    """
+    """Manage the video episodes file."""
 
     _response_model = VideoEpisodesModel
 
@@ -30,18 +25,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         offset: int = 0,
         language: str = "",
     ) -> dict[str, Any]:
-        """Downloads a page of video episodes.
-
-        Args:
-            program_id: A program (show) ID to limit results to a single show, e.g.
-                ``"dwc"``. When omitted, every video episode is returned.
-            limit: The maximum number of episodes to return.
-            offset: The number of episodes to skip.
-            language: The language code to use for the request.
-
-        Returns:
-            The raw JSON response as a dict, suitable for passing to ``parse()``.
-        """
+        """Downloads the video episodes file."""
         language = language or self._client.language
         if program_id is None:
             endpoint = f"showsapi/v1/{language}/video_episodes"
@@ -50,7 +34,12 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
                 f"showsapi/v1/{language}/video_programs/{program_id}/video_episodes"
             )
         params: dict[str, str | int] = {"limit": limit, "offset": offset}
-        return self._client.download(endpoint, params)
+        log_id = program_id if program_id is not None else f"{offset}/{limit}"
+        return self._client.download(
+            endpoint,
+            params,
+            log_id=f"{self.__class__.__name__} {log_id}",
+        )
 
     @staticmethod
     @override
@@ -65,19 +54,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         offset: int = 0,
         language: str = "",
     ) -> VideoEpisodesModel:
-        """Downloads and parses a page of video episodes.
-
-        Convenience method that calls ``download()`` then ``parse()``.
-
-        Args:
-            program_id: A program (show) ID to limit results to a single show, e.g.
-                ``"dwc"``. When omitted, every video episode is returned.
-            limit: The maximum number of episodes to return.
-            offset: The number of episodes to skip.
-            language: The language code to use for the request.
-
-        Returns:
-            A VideoEpisodesModel containing the parsed data.
+        """Downloads and parses the video episodes file.
 
         Raises:
             NoContentError: If the response has no meaningful content. The raw
@@ -89,7 +66,8 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
             offset=offset,
             language=language,
         )
-        return self._parse_or_raise(response, has_content=self.has_content(response))
+        log_id = program_id if program_id is not None else f"{offset}/{limit}"
+        return self._parse_or_raise(response, f"{self.__class__.__name__} {log_id}")
 
     def get_all(
         self,

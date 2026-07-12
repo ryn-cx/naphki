@@ -37,23 +37,12 @@ class BaseEndpoint[T: GAPIBaseModel](BaseExtractor[T]):
     def has_content(*args: Any, **kwargs: Any) -> bool:  # noqa: ANN401
         """Return whether the response has meaningful content."""
 
-    def _parse_or_raise(self, response: dict[str, Any], *, has_content: bool) -> T:
+    def _parse_or_raise(self, response: dict[str, Any], log_id: str) -> T:
         """Parse `response`, or raise `NoContentError` when it is empty.
-
-        This is the single place `get` decides "nothing here". The raised
-        `NoContentError` carries `response`, so callers can still recover the
-        downloaded payload from the exception.
-
-        Args:
-            response: The raw JSON response to parse.
-            has_content: The endpoint's `has_content` verdict for `response`.
-
-        Returns:
-            The parsed model.
 
         Raises:
             NoContentError: If `has_content` is false.
         """
-        if not has_content:
-            raise NoContentError(response, endpoint=type(self).__name__)
+        if not self.has_content(response):
+            raise NoContentError(response, log_id)
         return self.parse(response)
