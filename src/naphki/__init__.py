@@ -78,14 +78,4 @@ class Naphki:
 
         logger.debug("Downloaded %s (%.4f s)", operation, time.monotonic() - start)
 
-        output = response.json()
-        output["naphki"] = {}
-        output["naphki"]["url"] = url
-        output["naphki"]["timestamp"] = (
-            datetime.now().astimezone().isoformat().replace("+00:00", "Z")
-        )
-        output["naphki"]["params"] = params
-        if json_body is not None:
-            output["naphki"]["body"] = json_body
-
-        return output
+        return response.json()

@@ -1,4 +1,3 @@
-# TODO: Validate
 # ruff: noqa: D100, D101, D102, TC001, TC002, TC003
 from good_ass_pydantic_integrator import GAPIBaseModel
 from pydantic import AwareDatetime, ConfigDict
@@ -110,4 +109,4 @@ class VideoEpisodeModel(GAPIBaseModel):
     categories: list[Category]
     tags: list[Tag]
     related_videos: RelatedVideos
-    naphki: Naphki
+    naphki: Naphki | None = None

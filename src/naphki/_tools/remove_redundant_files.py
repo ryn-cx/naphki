@@ -1,4 +1,6 @@
 # TODO: Validate
+"""Removes redundant Naphki files."""
+
 import logging
 
 from good_ass_pydantic_integrator.utils import remove_redundant_files
