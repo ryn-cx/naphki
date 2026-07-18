@@ -1,4 +1,3 @@
-# TODO: Validate
 """Utils."""
 
 from __future__ import annotations
@@ -9,62 +8,102 @@ from typing import TYPE_CHECKING
 import pytest
 
 from naphki.constants import FILES_PATH
-from naphki.exceptions import HTTPError, NoContentError
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
+    from typing import Any
 
-TEST_FILES_DIRECTORY = FILES_PATH / "tests"
+    from good_ass_pydantic_integrator import GAPIBaseModel, GAPIClient
 
-
-def data_path(endpoint: object, name: str) -> Path:
-    """Return the path a file is saved at."""
-    return TEST_FILES_DIRECTORY / type(endpoint).__name__ / f"{name}.json"
+    from naphki.base_api_endpoint import BaseEndpoint
 
 
-def download_if_missing(
-    endpoint: object,
+def get_json_path(
+    endpoint: GAPIClient[Any],
     name: str,
-    download: Callable[[], object],
+    *,
+    folder: str | None = None,
 ) -> Path:
-    """Download the test file if it is missing."""
-    path = data_path(endpoint, name)
-    if not path.exists():
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(download(), indent=2))
-    assert path.exists()
-    return path
+    if folder is not None:
+        return FILES_PATH / folder / f"{name}.json"
+    return endpoint.json_files_folder() / f"{name}.json"
 
 
-def assert_http_error(
-    endpoint: object,
+def parse_json[T: GAPIBaseModel](endpoint: BaseEndpoint[T], name: str) -> T:
+    json_path = get_json_path(endpoint, name)
+    return endpoint.parse(json.loads(json_path.read_text()))
+
+
+# The loaders below produce each input shape that an ``extract`` helper accepts,
+# so extraction tests can parametrize over a single ``load`` callable.
+def single_dict(endpoint: BaseEndpoint[Any], name: str) -> dict[str, Any]:
+    """A single recorded page as a raw dict."""
+    return json.loads(get_json_path(endpoint, name).read_text())
+
+
+def page_dicts(
+    endpoint: BaseEndpoint[Any],
+    name: str,
+    *,
+    folder: str | None = None,
+) -> list[dict[str, Any]]:
+    """Recorded page(s) as a list of raw dicts, wrapping a single page."""
+    content: list[dict[str, Any]] | dict[str, Any] = json.loads(
+        get_json_path(endpoint, name, folder=folder).read_text(),
+    )
+    return content if isinstance(content, list) else [content]
+
+
+def page_models[T: GAPIBaseModel](
+    endpoint: BaseEndpoint[T],
+    name: str,
+    *,
+    folder: str | None = None,
+) -> list[T]:
+    """Recorded page(s) as a list of parsed models, wrapping a single page."""
+    return [endpoint.parse(page) for page in page_dicts(endpoint, name, folder=folder)]
+
+
+def download_and_save(
+    endpoint: GAPIClient[Any],
+    name: str,
+    get: Callable[[], dict[str, Any] | list[dict[str, Any]]],
+    *,
+    folder: str | None = None,
+) -> Path:
+    json_path = get_json_path(endpoint, name, folder=folder)
+    if json_path.exists():
+        pytest.skip(f"File already recorded for {type(endpoint).__name__}/{name}")
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    json_path.write_text(json.dumps(get(), indent=2))
+    return json_path
+
+
+def assert_error(
+    endpoint: GAPIClient[Any],
     name: str,
     download: Callable[[], object],
+    error: type[Exception],
 ) -> None:
-    """Assert that download raises HTTPError."""
-    if data_path(endpoint, name).exists():
-        pytest.skip(f"error already recorded for {type(endpoint).__name__}/{name}")
-    with pytest.raises(HTTPError):
+    if get_error_path(endpoint, name).exists():
+        pytest.skip(f"File already recorded for {type(endpoint).__name__}/{name}")
+    with pytest.raises(error) as excinfo:
         download()
-    record_error(endpoint, name)
+    record_error(endpoint, name, getattr(excinfo.value, "response", None))
 
 
-def assert_no_content_error(
-    endpoint: object,
+def get_error_path(endpoint: GAPIClient[Any], name: str) -> Path:
+    folder = f"Errors/{endpoint.json_files_folder().name}"
+    return get_json_path(endpoint, name, folder=folder)
+
+
+def record_error(
+    endpoint: GAPIClient[Any],
     name: str,
-    download: Callable[[], object],
+    data: dict[str, Any] | None = None,
 ) -> None:
-    """Assert that download raises NoContentError."""
-    if data_path(endpoint, name).exists():
-        pytest.skip(f"error already recorded for {type(endpoint).__name__}/{name}")
-    with pytest.raises(NoContentError):
-        download()
-    record_error(endpoint, name)
-
-
-def record_error(endpoint: object, name: str) -> None:
-    """Record error."""
-    path = data_path(endpoint, name)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("")
+    json_path = get_error_path(endpoint, name)
+    json_path.parent.mkdir(parents=True, exist_ok=True)
+    content = json.dumps(data, indent=2) if data is not None else ""
+    json_path.write_text(content)

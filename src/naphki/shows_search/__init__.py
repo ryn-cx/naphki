@@ -3,16 +3,28 @@
 
 from __future__ import annotations
 
-from typing import Any, override
+from logging import NullHandler, getLogger
+from typing import Any
 
 from naphki.base_api_endpoint import BaseEndpoint
 from naphki.shows_search.models import ShowsSearchModel
+
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
 
 
 class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
     """Manage the shows search file."""
 
     _response_model = ShowsSearchModel
+
+    def get_log_id(self, query: str, *, from_: int = 0, size: int = 40) -> str:
+        """Build the log id for a download."""
+        return self.append_non_default_args(
+            f"{self.__class__.__name__} {query=}",
+            from_=(from_, 0),
+            size=(size, 40),
+        )
 
     def download(self, query: str, *, from_: int = 0, size: int = 40) -> dict[str, Any]:
         """Downloads the shows search file."""
@@ -49,25 +61,14 @@ class ShowsSearch(BaseEndpoint[ShowsSearchModel]):
             endpoint,
             {},
             json_body=body,
-            log_id=f"{self.__class__.__name__} {query}",
+            log_id=self.get_log_id(query, from_=from_, size=size),
         )
 
-    @staticmethod
-    @override
-    def has_content(response: dict[str, Any]) -> bool:
-        return bool(response["hits"]["hits"])
+    def download_and_parse(self, query: str) -> ShowsSearchModel:
+        """Downloads and parses the shows search file."""
+        return self.parse(self.download(query))
 
-    def get(self, query: str) -> ShowsSearchModel:
-        """Downloads and parses the shows search file.
-
-        Raises:
-            NoContentError: If the response has no meaningful content. The raw
-                response is available on the exception's `response` attribute.
-        """
-        response = self.download(query)
-        return self._parse_or_raise(response, f"{self.__class__.__name__} {query}")
-
-    def get_all(self, query: str) -> list[ShowsSearchModel]:
+    def download_and_parse_all(self, query: str) -> list[ShowsSearchModel]:
         """Searches for shows and parses every page of results.
 
         Repeatedly searches, advancing through the result set until every match

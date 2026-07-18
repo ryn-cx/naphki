@@ -3,7 +3,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, override
+from logging import NullHandler, getLogger
+from typing import TYPE_CHECKING, Any
 
 from naphki.base_api_endpoint import BaseEndpoint
 from naphki.video_episodes.models import VideoEpisodesModel
@@ -11,11 +12,30 @@ from naphki.video_episodes.models import VideoEpisodesModel
 if TYPE_CHECKING:
     from datetime import datetime
 
+logger = getLogger(__name__)
+logger.addHandler(NullHandler())
+
 
 class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
     """Manage the video episodes file."""
 
     _response_model = VideoEpisodesModel
+
+    def get_log_id(
+        self,
+        program_id: str | None = None,
+        *,
+        limit: int = 20,
+        offset: int = 0,
+        language: str = "",
+    ) -> str:
+        """Build the log id for a download."""
+        return self.append_non_default_args(
+            f"{self.__class__.__name__} {program_id=}",
+            limit=(limit, 20),
+            offset=(offset, 0),
+            language=(language, ""),
+        )
 
     def download(
         self,
@@ -26,27 +46,27 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         language: str = "",
     ) -> dict[str, Any]:
         """Downloads the video episodes file."""
-        language = language or self._client.language
+        resolved_language = language or self._client.language
         if program_id is None:
-            endpoint = f"showsapi/v1/{language}/video_episodes"
+            endpoint = f"showsapi/v1/{resolved_language}/video_episodes"
         else:
             endpoint = (
-                f"showsapi/v1/{language}/video_programs/{program_id}/video_episodes"
+                f"showsapi/v1/{resolved_language}"
+                f"/video_programs/{program_id}/video_episodes"
             )
         params: dict[str, str | int] = {"limit": limit, "offset": offset}
-        log_id = program_id if program_id is not None else f"{offset}/{limit}"
         return self._client.download(
             endpoint,
             params,
-            log_id=f"{self.__class__.__name__} {log_id}",
+            log_id=self.get_log_id(
+                program_id,
+                limit=limit,
+                offset=offset,
+                language=language,
+            ),
         )
 
-    @staticmethod
-    @override
-    def has_content(response: dict[str, Any]) -> bool:
-        return bool(response["items"])
-
-    def get(
+    def download_and_parse(
         self,
         program_id: str | None = None,
         *,
@@ -54,22 +74,17 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         offset: int = 0,
         language: str = "",
     ) -> VideoEpisodesModel:
-        """Downloads and parses the video episodes file.
-
-        Raises:
-            NoContentError: If the response has no meaningful content. The raw
-                response is available on the exception's `response` attribute.
-        """
-        response = self.download(
-            program_id,
-            limit=limit,
-            offset=offset,
-            language=language,
+        """Downloads and parses the video episodes file."""
+        return self.parse(
+            self.download(
+                program_id,
+                limit=limit,
+                offset=offset,
+                language=language,
+            ),
         )
-        log_id = program_id if program_id is not None else f"{offset}/{limit}"
-        return self._parse_or_raise(response, f"{self.__class__.__name__} {log_id}")
 
-    def get_all(
+    def download_and_parse_all(
         self,
         program_id: str | None = None,
         *,
@@ -78,8 +93,8 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
     ) -> list[VideoEpisodesModel]:
         """Downloads and parses every page of video episodes.
 
-        Repeatedly calls ``get()``, advancing through the pagination until all
-        episodes have been retrieved.
+        Repeatedly calls ``download_and_parse()``, advancing through the
+        pagination until all episodes have been retrieved.
 
         Episodes are returned newest first (by ``video.published_at``). When
         ``to_datetime`` is given, scraping stops once an episode published at or
@@ -99,7 +114,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         pages: list[VideoEpisodesModel] = []
         offset = 0
         while True:
-            page = self.get(
+            page = self.download_and_parse(
                 program_id,
                 offset=offset,
                 language=language,
