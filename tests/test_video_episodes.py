@@ -31,11 +31,3 @@ class TestVideoEpisodes:
     def test_parse(self, endpoint: VideoEpisodes) -> None:
         data = parse_json(endpoint, EPISODES_PROGRAM_ID)
         assert all(item.video_program.id == EPISODES_PROGRAM_ID for item in data.items)
-
-
-@pytest.mark.parametrize("offset", [0, 20])
-def test_log_id(endpoint: VideoEpisodes, offset: int) -> None:
-    expected = f"VideoEpisodes program_id={EPISODES_PROGRAM_ID!r}"
-    if offset != 0:
-        expected += f" offset={offset!r}"
-    assert endpoint.get_log_id(EPISODES_PROGRAM_ID, offset=offset) == expected

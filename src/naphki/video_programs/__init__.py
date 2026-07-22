@@ -18,21 +18,15 @@ class VideoPrograms(BaseEndpoint[VideoProgramsModel]):
 
     _response_model = VideoProgramsModel
 
-    def get_log_id(self, program_id: str, language: str = "") -> str:
-        """Build the log id for a download."""
-        return self.append_non_default_args(
-            f"{self.__class__.__name__} {program_id=}",
-            language=(language, ""),
-        )
-
     def download(self, program_id: str, language: str = "") -> dict[str, Any]:
         """Downloads the video programs file."""
+        log_id = self.get_log_id(self.download, locals())
         resolved_language = language or self._client.language
         endpoint = f"showsapi/v1/{resolved_language}/video_programs/{program_id}"
         return self._client.download(
             endpoint,
             {},
-            log_id=self.get_log_id(program_id, language),
+            log_id=log_id,
         )
 
     def download_and_parse(

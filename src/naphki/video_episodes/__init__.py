@@ -21,22 +21,6 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
 
     _response_model = VideoEpisodesModel
 
-    def get_log_id(
-        self,
-        program_id: str | None = None,
-        *,
-        limit: int = 20,
-        offset: int = 0,
-        language: str = "",
-    ) -> str:
-        """Build the log id for a download."""
-        return self.append_non_default_args(
-            f"{self.__class__.__name__} {program_id=}",
-            limit=(limit, 20),
-            offset=(offset, 0),
-            language=(language, ""),
-        )
-
     def download(
         self,
         program_id: str | None = None,
@@ -46,6 +30,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         language: str = "",
     ) -> dict[str, Any]:
         """Downloads the video episodes file."""
+        log_id = self.get_log_id(self.download, locals())
         resolved_language = language or self._client.language
         if program_id is None:
             endpoint = f"showsapi/v1/{resolved_language}/video_episodes"
@@ -58,12 +43,7 @@ class VideoEpisodes(BaseEndpoint[VideoEpisodesModel]):
         return self._client.download(
             endpoint,
             params,
-            log_id=self.get_log_id(
-                program_id,
-                limit=limit,
-                offset=offset,
-                language=language,
-            ),
+            log_id=log_id,
         )
 
     def download_and_parse(

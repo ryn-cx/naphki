@@ -32,11 +32,3 @@ class TestShowsSearch:
         assert any(
             SEARCH_QUERY in hit.field_source.title.lower() for hit in data.hits.hits
         )
-
-
-@pytest.mark.parametrize("from_", [0, 40])
-def test_log_id(endpoint: ShowsSearch, from_: int) -> None:
-    expected = f"ShowsSearch query={SEARCH_QUERY!r}"
-    if from_ != 0:
-        expected += f" from_={from_!r}"
-    assert endpoint.get_log_id(SEARCH_QUERY, from_=from_) == expected
