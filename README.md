@@ -1,11 +1,9 @@
 <!-- TODO: Validate -->
 # Naphki
 
-Unofficial [NHK World](https://www3.nhk.or.jp/nhkworld/) API.
-
-`naphki` wraps NHK World's web API and parses its raw JSON into typed
-[Pydantic](https://docs.pydantic.dev/) models, giving you a small, structured API for
-reading data about NHK World video episodes.
+[NHK World](https://www3.nhk.or.jp/nhkworld/) API wrapper built using [Good Ass
+Pydantic Integrator](https://github.com/ryn-cx/good-ass-pydantic-integrator) and
+[Get Around](https://github.com/ryn-cx/get-around).
 
 ## Installation
 
@@ -15,25 +13,30 @@ uv add git+https://github.com/ryn-cx/naphki
 
 ## Usage
 
-Create a client, then call `get(...)` on an endpoint to download from NHK World and
-get back a parsed, typed model.
+Calling an endpoint returns the parsed model. `download()` returns the response
+as text and `load()` reads that text into the model.
 
 ```python
 from naphki import Naphki
 
 client = Naphki()
 
-# A page of video episodes (across every show).
-episodes = client.video_episodes.get(limit=20, offset=0)
+# A page of episodes for one show, by its program id.
+episodes = client.video_episodes("dwc", limit=20, offset=0)
 
-# A page of video episodes for a single show, by its program ID.
-# "dwc" is from https://www3.nhk.or.jp/nhkworld/en/shows/dwc/
-show_episodes = client.video_episodes.get("dwc")
+# A page of episodes across every show.
+everything = client.video_episodes()
 
-# A single show (video program), by its program ID.
-program = client.video_programs.get("japanologyplus")
+# One episode, by its episode id.
+episode = client.video_episode(5001461)
 
-# Search for shows (video programs) by a search term.
-results = client.shows_search.get("japan")
+# One show, by its program id.
+program = client.video_program("japanologyplus")
 
+# Shows matching a search term.
+results = client.shows_search("japan")
+
+# The two halves of a call.
+downloaded = client.video_program.download("japanologyplus")
+program = client.video_program.load(downloaded)
 ```

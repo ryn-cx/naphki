@@ -5,30 +5,45 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from tests.utils import download_and_save, parse_json
+from naphki.shows_search.models import ShowsSearchModel
+from tests.utils import RecordedEndpoint
 
 if TYPE_CHECKING:
     from naphki import Naphki
-    from naphki.shows_search import ShowsSearch
 
-SEARCH_QUERY = "japan"
+SIZE = 3
+"""A few results a page, so a page stays small enough to read."""
+
+QUERIES = [
+    pytest.param("japan", id="shows about japan"),
+    pytest.param("qwertyuiopasdfghjkl", id="term nothing matches"),
+]
+
+HIT_COUNTS = [
+    pytest.param("japan", SIZE, id="shows about japan"),
+    pytest.param("qwertyuiopasdfghjkl", 0, id="term nothing matches"),
+]
 
 
-@pytest.fixture(scope="session")
-def endpoint(client: Naphki) -> ShowsSearch:
-    return client.shows_search
+# TODO: Validate
+class ShowsSearchTest(RecordedEndpoint):
+    MODEL = ShowsSearchModel
+    # How long the search took and how well each show scored move on their own.
+    IGNORED = ("ShowsSearchModel.took",)
+    SAME_TYPE = ("Hits.max_score", "Hit.field_score", "Total.value")
 
 
-class TestShowsSearch:
-    def test_download(self, endpoint: ShowsSearch) -> None:
-        download_and_save(
-            endpoint,
-            SEARCH_QUERY,
-            lambda: endpoint.download(SEARCH_QUERY),
-        )
+# TODO: Validate
+@pytest.mark.parametrize("query", QUERIES)
+def test_download(client: Naphki, query: str) -> None:
+    ShowsSearchTest.download_test(
+        query,
+        lambda: client.shows_search.download(query, size=SIZE),
+    )
 
-    def test_parse(self, endpoint: ShowsSearch) -> None:
-        data = parse_json(endpoint, SEARCH_QUERY)
-        assert any(
-            SEARCH_QUERY in hit.field_source.title.lower() for hit in data.hits.hits
-        )
+
+# TODO: Validate
+@pytest.mark.parametrize(("query", "hit_count"), HIT_COUNTS)
+def test_parse(client: Naphki, query: str, hit_count: int) -> None:
+    results = client.shows_search.load(ShowsSearchTest.recorded_content(query))
+    assert len(results.hits.hits) == hit_count

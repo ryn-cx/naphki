@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			"path": "src/naphki/_files"
+			"path": "tests/_files"
 		}
 	],
 	"settings": {}

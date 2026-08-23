@@ -19,7 +19,7 @@ repos:
         require_serial: true
         language: unsupported
         types: [python]
-        exclude: (^|/)models\.py$
+        exclude: (^|/)(models|strict_models|optional_models)\.py$
 
       - id: local-ruff-format
         name: ruff format
@@ -27,7 +27,7 @@ repos:
         require_serial: true
         language: unsupported
         types: [python]
-        exclude: (^|/)models\.py$
+        exclude: (^|/)(models|strict_models|optional_models)\.py$
 
       - id: local-mypy
         name: mypy check
