@@ -48,6 +48,13 @@ class Category(BaseModel):
     name: str
     uri: str
 
+class Tag(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    id: str
+    url: str
+    name: str
+    uri: str
+
 class Item(BaseModel):
     model_config = ConfigDict(defer_build=True)
     type: str
@@ -57,8 +64,8 @@ class Item(BaseModel):
     voice_langs: list[str]
     video_program: VideoProgram
     url: str
-    title: str
-    html_title: str
+    title: str | None
+    html_title: str | None
     description: str
     html_description: str
     broadcast_schedules: list[BroadcastSchedule]
@@ -66,7 +73,7 @@ class Item(BaseModel):
     images: list[Image]
     video: Video
     categories: list[Category]
-    tags: list[None]
+    tags: list[Tag]
 
 class VideoEpisodesModel(BaseModel):
     model_config = ConfigDict(defer_build=True)

@@ -53,6 +53,13 @@ class Category(BaseModel):
     name: str | None = None
     uri: str | None = None
 
+class Tag(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    id: str | None = None
+    url: str | None = None
+    name: str | None = None
+    uri: str | None = None
+
 class VideoEpisodes(BaseModel):
     model_config = ConfigDict(extra='ignore', defer_build=True)
     total: int | None = None
@@ -91,7 +98,7 @@ class VideoProgramModel(BaseModel):
     hero: Hero | None = None
     banners: list[Any] | None = None
     categories: list[Category] | None = None
-    tags: list[Any] | None = None
+    tags: list[Tag] | None = None
     video_episodes: VideoEpisodes | None = None
     video_clips: VideoClips | None = None
     casts: Casts | None = None

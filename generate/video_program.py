@@ -6,13 +6,12 @@ from __future__ import annotations
 import logging
 
 from get_around import build_client_automatically
-from good_ass_pydantic_integrator import generate_model
 
 from generate.constants import FILES_PATH, NAPHKI_PATH
-from generate.utils import download_if_missing
+from generate.utils import download_if_missing, load_ids, rebuild_model
 from naphki import Naphki
 
-PROGRAM_IDS = ["japanologyplus"]
+PROGRAM_IDS = load_ids("VideoProgramModel")
 
 
 # TODO: Validate
@@ -25,7 +24,7 @@ def generate_video_program(client: Naphki) -> None:
             program_id,
             lambda program_id=program_id: client.video_program.download(program_id),
         )
-    generate_model(FILES_PATH, NAPHKI_PATH, "VideoProgramModel")
+    rebuild_model(FILES_PATH, NAPHKI_PATH, "VideoProgramModel")
 
 
 if __name__ == "__main__":

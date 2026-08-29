@@ -6,13 +6,12 @@ from __future__ import annotations
 import logging
 
 from get_around import build_client_automatically
-from good_ass_pydantic_integrator import generate_model
 
 from generate.constants import FILES_PATH, NAPHKI_PATH
-from generate.utils import download_if_missing
+from generate.utils import download_if_missing, load_ids, rebuild_model
 from naphki import Naphki
 
-EPISODE_IDS = [5001461]
+EPISODE_IDS = load_ids("VideoEpisodeModel")
 
 
 # TODO: Validate
@@ -25,7 +24,7 @@ def generate_video_episode(client: Naphki) -> None:
             episode_id,
             lambda episode_id=episode_id: client.video_episode.download(episode_id),
         )
-    generate_model(FILES_PATH, NAPHKI_PATH, "VideoEpisodeModel")
+    rebuild_model(FILES_PATH, NAPHKI_PATH, "VideoEpisodeModel")
 
 
 if __name__ == "__main__":

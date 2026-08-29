@@ -54,6 +54,13 @@ class Category(BaseModel):
     name: str
     uri: str
 
+class Tag(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    id: str
+    url: str
+    name: str
+    uri: str
+
 class VideoEpisodes(BaseModel):
     model_config = ConfigDict(defer_build=True)
     total: int
@@ -92,7 +99,7 @@ class VideoProgramModel(BaseModel):
     hero: Hero
     banners: list[None]
     categories: list[Category]
-    tags: list[None]
+    tags: list[Tag]
     video_episodes: VideoEpisodes
     video_clips: VideoClips
     casts: Casts

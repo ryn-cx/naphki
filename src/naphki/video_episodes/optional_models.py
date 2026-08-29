@@ -47,6 +47,13 @@ class Category(BaseModel):
     name: str | None = None
     uri: str | None = None
 
+class Tag(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    id: str | None = None
+    url: str | None = None
+    name: str | None = None
+    uri: str | None = None
+
 class Item(BaseModel):
     model_config = ConfigDict(extra='ignore', defer_build=True)
     type: str | None = None
@@ -65,7 +72,7 @@ class Item(BaseModel):
     images: list[Image] | None = None
     video: Video | None = None
     categories: list[Category] | None = None
-    tags: list[Any] | None = None
+    tags: list[Tag] | None = None
 
 class VideoEpisodesModel(BaseModel):
     model_config = ConfigDict(extra='ignore', defer_build=True)

@@ -6,13 +6,12 @@ from __future__ import annotations
 import logging
 
 from get_around import build_client_automatically
-from good_ass_pydantic_integrator import generate_model
 
 from generate.constants import FILES_PATH, NAPHKI_PATH
-from generate.utils import download_if_missing
+from generate.utils import download_if_missing, load_ids, rebuild_model
 from naphki import Naphki
 
-QUERIES = ["japan", "qwertyuiopasdfghjkl"]
+QUERIES = load_ids("ShowsSearchModel")
 
 SIZE = 3
 """A few results a page, which is how the recorded pages were asked for."""
@@ -28,7 +27,7 @@ def generate_shows_search(client: Naphki) -> None:
             query,
             lambda query=query: client.shows_search.download(query, size=SIZE),
         )
-    generate_model(FILES_PATH, NAPHKI_PATH, "ShowsSearchModel")
+    rebuild_model(FILES_PATH, NAPHKI_PATH, "ShowsSearchModel")
 
 
 if __name__ == "__main__":
