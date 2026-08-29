@@ -4,7 +4,7 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict
 from typing import Any
 
 class VideoProgram(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     title: str | None = None
     html_title: str | None = None
@@ -12,18 +12,18 @@ class VideoProgram(BaseModel):
     uri: str | None = None
 
 class BroadcastSchedule(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     start_at: AwareDatetime | None = None
     end_at: AwareDatetime | None = None
 
 class Image(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
 
 class Video(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     vod_id: Any | None = None
     url: str | None = None
     duration: int | None = None
@@ -32,7 +32,7 @@ class Video(BaseModel):
     expired_at: AwareDatetime | None = None
 
 class Image1(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
@@ -40,7 +40,7 @@ class Image1(BaseModel):
     html_caption: str | None = None
 
 class Content(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     title: Any | None = None
     html_title: Any | None = None
     image: Image1 | None = None
@@ -48,26 +48,26 @@ class Content(BaseModel):
     html_body: Any | None = None
 
 class Category(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     url: str | None = None
     name: str | None = None
     uri: str | None = None
 
 class Tag(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     url: str | None = None
     name: str | None = None
     uri: str | None = None
 
 class RelatedVideos(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     total: int | None = None
     uri: str | None = None
 
 class VideoEpisodeModel(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     type: str | None = None
     id: str | None = None
     lang: str | None = None

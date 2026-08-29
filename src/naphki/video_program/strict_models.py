@@ -1,63 +1,77 @@
 from typing import Self
 from pydantic import ModelWrapValidatorHandler, PrivateAttr, model_validator
+from pydantic import ConfigDict
 from pydantic import BaseModel
 from typing import Any
 
 class LandscapeItem(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     url: str
     width: int
     height: int
 
 class PortraitItem(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     url: str
     width: int
     height: int
 
 class Images(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     landscape: list[LandscapeItem]
     portrait: list[PortraitItem]
 
 class Image(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     url: str
     width: int
     height: int
 
 class Logo(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     url: str
     width: int
 
 class Sp(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     images: list[Image]
     logo: Logo
 
 class Pc(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     images: list[Image]
     logo: Logo
 
 class Hero(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     sp: Sp
     pc: Pc
 
 class Category(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     id: str
     url: str
     name: str
     uri: str
 
 class VideoEpisodes(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     total: int
     uri: str
 
 class VideoClips(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     total: int
     uri: str
 
 class Casts(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     title: None
     total: int
     uri: str
 
 class VideoProgramModel(BaseModel):
+    model_config = ConfigDict(defer_build=True)
     type: str
     id: str
     lang: str

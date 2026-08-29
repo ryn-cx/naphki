@@ -4,7 +4,7 @@ from typing import Any
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
 class Pagination(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     limit: int | None = None
     offset: int | None = None
     count: int | None = None
@@ -13,7 +13,7 @@ class Pagination(BaseModel):
     previous: Any | None = None
 
 class VideoProgram(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     title: str | None = None
     html_title: str | None = None
@@ -21,18 +21,18 @@ class VideoProgram(BaseModel):
     uri: str | None = None
 
 class BroadcastSchedule(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     start_at: AwareDatetime | None = None
     end_at: AwareDatetime | None = None
 
 class Image(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
 
 class Video(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     vod_id: Any | None = None
     url: str | None = None
     duration: int | None = None
@@ -41,14 +41,14 @@ class Video(BaseModel):
     expired_at: AwareDatetime | None = None
 
 class Category(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     url: str | None = None
     name: str | None = None
     uri: str | None = None
 
 class Item(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     type: str | None = None
     id: str | None = None
     lang: str | None = None
@@ -68,7 +68,7 @@ class Item(BaseModel):
     tags: list[Any] | None = None
 
 class VideoEpisodesModel(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     pagination: Pagination | None = None
     items: list[Item] | None = None
     _raw_input: Any = PrivateAttr(default=None)

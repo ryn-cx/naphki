@@ -4,73 +4,73 @@ from pydantic import BaseModel, ConfigDict
 from typing import Any
 
 class LandscapeItem(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
 
 class PortraitItem(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
 
 class Images(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     landscape: list[LandscapeItem] | None = None
     portrait: list[PortraitItem] | None = None
 
 class Image(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
     height: int | None = None
 
 class Logo(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     url: str | None = None
     width: int | None = None
 
 class Sp(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     images: list[Image] | None = None
     logo: Logo | None = None
 
 class Pc(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     images: list[Image] | None = None
     logo: Logo | None = None
 
 class Hero(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     sp: Sp | None = None
     pc: Pc | None = None
 
 class Category(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
     url: str | None = None
     name: str | None = None
     uri: str | None = None
 
 class VideoEpisodes(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     total: int | None = None
     uri: str | None = None
 
 class VideoClips(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     total: int | None = None
     uri: str | None = None
 
 class Casts(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     title: Any | None = None
     total: int | None = None
     uri: str | None = None
 
 class VideoProgramModel(BaseModel):
-    model_config = ConfigDict(extra='ignore')
+    model_config = ConfigDict(extra='ignore', defer_build=True)
     type: str | None = None
     id: str | None = None
     lang: str | None = None
