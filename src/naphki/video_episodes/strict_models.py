@@ -1,8 +1,7 @@
-from typing import Self
+from typing import Any, Self
 from pydantic import ModelWrapValidatorHandler, PrivateAttr, model_validator
 from pydantic import ConfigDict
 from pydantic import AwareDatetime, BaseModel
-from typing import Any
 
 class Pagination(BaseModel):
     model_config = ConfigDict(defer_build=True)
@@ -60,7 +59,7 @@ class Item(BaseModel):
     type: str
     id: str
     lang: str
-    caption_langs: list[None]
+    caption_langs: list[str]
     voice_langs: list[str]
     video_program: VideoProgram
     url: str

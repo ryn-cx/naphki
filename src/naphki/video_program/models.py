@@ -15,16 +15,20 @@ from .strict_models import VideoProgramModel as StrictModel
 
 if TYPE_CHECKING:
     from .strict_models import (
+        Banner,
         Casts,
         Category,
         Hero,
         Image,
+        Image2,
         Images,
         LandscapeItem,
         Logo,
         Pc,
+        Pc1,
         PortraitItem,
         Sp,
+        Sp1,
         Tag,
         VideoClips,
         VideoEpisodes,
@@ -32,16 +36,20 @@ if TYPE_CHECKING:
     )
 else:
     from .optional_models import (
+        Banner,
         Casts,
         Category,
         Hero,
         Image,
+        Image2,
         Images,
         LandscapeItem,
         Logo,
         Pc,
+        Pc1,
         PortraitItem,
         Sp,
+        Sp1,
         Tag,
         VideoClips,
         VideoEpisodes,
@@ -49,16 +57,20 @@ else:
     )
 
 __all__ = [
+    "Banner",
     "Casts",
     "Category",
     "Hero",
     "Image",
+    "Image2",
     "Images",
     "LandscapeItem",
     "Logo",
     "Pc",
+    "Pc1",
     "PortraitItem",
     "Sp",
+    "Sp1",
     "Tag",
     "VideoClips",
     "VideoEpisodes",

@@ -46,6 +46,29 @@ class Hero(BaseModel):
     sp: Sp | None = None
     pc: Pc | None = None
 
+class Sp1(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    url: str | None = None
+    width: int | None = None
+    height: int | None = None
+
+class Pc1(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    url: str | None = None
+    width: int | None = None
+    height: int | None = None
+
+class Image2(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    sp: Sp1 | None = None
+    pc: Pc1 | None = None
+    alt: str | None = None
+
+class Banner(BaseModel):
+    model_config = ConfigDict(extra='ignore', defer_build=True)
+    url: str | None = None
+    image: Image2 | None = None
+
 class Category(BaseModel):
     model_config = ConfigDict(extra='ignore', defer_build=True)
     id: str | None = None
@@ -96,7 +119,7 @@ class VideoProgramModel(BaseModel):
     sns_image: str | None = None
     images: Images | None = None
     hero: Hero | None = None
-    banners: list[Any] | None = None
+    banners: list[Banner] | None = None
     categories: list[Category] | None = None
     tags: list[Tag] | None = None
     video_episodes: VideoEpisodes | None = None

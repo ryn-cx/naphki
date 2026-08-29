@@ -1,8 +1,7 @@
-from typing import Self
+from typing import Any, Self
 from pydantic import ModelWrapValidatorHandler, PrivateAttr, model_validator
 from pydantic import ConfigDict
 from pydantic import BaseModel
-from typing import Any
 
 class LandscapeItem(BaseModel):
     model_config = ConfigDict(defer_build=True)
@@ -46,6 +45,29 @@ class Hero(BaseModel):
     model_config = ConfigDict(defer_build=True)
     sp: Sp
     pc: Pc
+
+class Sp1(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    url: str
+    width: int
+    height: int
+
+class Pc1(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    url: str
+    width: int
+    height: int
+
+class Image2(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    sp: Sp1
+    pc: Pc1
+    alt: str
+
+class Banner(BaseModel):
+    model_config = ConfigDict(defer_build=True)
+    url: str
+    image: Image2
 
 class Category(BaseModel):
     model_config = ConfigDict(defer_build=True)
@@ -97,7 +119,7 @@ class VideoProgramModel(BaseModel):
     sns_image: str
     images: Images
     hero: Hero
-    banners: list[None]
+    banners: list[Banner]
     categories: list[Category]
     tags: list[Tag]
     video_episodes: VideoEpisodes

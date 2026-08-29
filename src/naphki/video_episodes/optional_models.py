@@ -59,7 +59,7 @@ class Item(BaseModel):
     type: str | None = None
     id: str | None = None
     lang: str | None = None
-    caption_langs: list[Any] | None = None
+    caption_langs: list[str] | None = None
     voice_langs: list[str] | None = None
     video_program: VideoProgram | None = None
     url: str | None = None
